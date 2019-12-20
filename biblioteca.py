@@ -2,7 +2,7 @@ import os
 from Libros import Libros
 
 CARPETA_DISPONIBLE = 'Biblioteca/disponibles/'
-CARPETA_OCUPADOS = 'Biblioteca/ocupados/'
+CARPETA_OCUPADOS = 'Biblioteca/prestados/'
 EXTENSION = '.txt'
 
 def app():
@@ -24,20 +24,46 @@ def app():
         elif opcion == 2:
             editar_libro()
             preguntar = False
+        elif opcion == 3:
+            eliminar_libro()
+            preguntar = False
+        elif opcion == 4:
+            ver_libros_disponibles()
+            preguntar = False
         else:
             print('No es una opción Válida')
+
+def ver_libros_disponibles():
+    print('Listar los Libros Disponibles en Tienda')
+    disponibles = os.listdir(CARPETA_DISPONIBLE)
+    registros = [i for i in disponibles if i.endswith(EXTENSION)]
+
+    for registro in registros:
+        with open(CARPETA_DISPONIBLE + registro) as libro:
+            for linea in libro:
+                print(linea.rstrip())
+            print('\r\n')
+
+def eliminar_libro():
+    codigo = input('Ingrese el Codigo del libro a Eliminar \r\n')
+
+    try:
+        os.remove(CARPETA_DISPONIBLE + codigo + EXTENSION)
+        print('\r\n Eliminado Correctamente')
+    except IOError:
+        print('\r\n Asegurese que el codigo Exista o Se encuentra en la Biblioteca')
 
 def editar_libro():
     print('Escribe el Codigo del Libro a editar \r\n')
     codigo_buscar = input('Codigo del Libro a Buscar:  \r\n')
 
     existe = existe_libro(codigo_buscar)
-    print(existe)
+   
     if existe:
         with open(CARPETA_DISPONIBLE + codigo_buscar + EXTENSION, 'w') as archivo:
         
         #resto de los campos
-            codigo_nuevo = input('Ingrese el Codigo del Libro \r\n')
+            codigo_nuevo = input('Ingrese el Nuevo Codigo del Libro \r\n')
             nombre_libro = input('Ingrese el Nuevo Nombre del Libro \r\n')
             autor_libro = input('Ingrese el Nuevo Nombre del Autor del Libro \r\n')
             paginas_libro = input('Ingrese el Nuevo numero de paginas del libro \r\n')
@@ -47,14 +73,16 @@ def editar_libro():
         
         #Escribir en el archivo
             archivo.write('Codigo: \r\n'+ Libro.codigo+ '\r\n')
-            archivo.write('Nombre: \r\n'+ Libro.nombre, '\r\n')
-            archivo.write('Paginas: \r\n'+ Libro.paginas, '\r\n')
+            archivo.write('Nombre: \r\n'+ Libro.nombre+ '\r\n')
+            archivo.write('Paginas: \r\n'+ Libro.paginas+ '\r\n')
             archivo.write('Autor: \r\n'+ Libro.autor)
 
         #Mensaje de exito
             os.rename(CARPETA_DISPONIBLE + codigo_buscar + EXTENSION, CARPETA_DISPONIBLE + codigo_nuevo + EXTENSION)
         
         print('\r\n Actualizado Correctamente \r\n') 
+    else:
+        print('\r\n El Codigo del Libro no se encuentra')
 
 def registrar_libro():
     print('Escriba los siguientes datos para registrar el Libro')
@@ -71,10 +99,10 @@ def registrar_libro():
             Libro = Libros(codigo, nombre_libro, paginas_libro, autor_libro)
 
             #Escribir en el archivo
-            archivo.write('Codigo: \r\n'+ Libro.codigo)
-            archivo.write('Nombre: \r\n'+ Libro.nombre)
-            archivo.write('Paginas: \r\n'+ Libro.paginas)
-            archivo.write('Autor: \r\n'+ Libro.autor)
+            archivo.write('Codigo: '+ Libro.codigo)
+            archivo.write('\r\nNombre: '+ Libro.nombre)
+            archivo.write('\r\nPaginas: '+ Libro.paginas)
+            archivo.write('\r\nAutor: '+ Libro.autor)
 
             #Mensaje de exito
             print('\r\n Contacto Creado Correctamente \r\n')    
@@ -87,8 +115,9 @@ def mostrar_menu():
     print('1) Registrar Libro')
     print('2) Editar Libro')
     print('3) Eliminar Libro')
-    print('4) Ver Libros')
-    print('5) Hacer Prestamo del Libro')
+    print('4) Ver Libros Disponibles')
+    print('5) Ver Libros Prestados')
+    print('6) Hacer Prestamo del Libro')
 
 
 def crear_directorios():
