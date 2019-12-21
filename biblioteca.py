@@ -1,4 +1,5 @@
 import os
+import shutil
 from Libros import Libros
 
 CARPETA_DISPONIBLE = 'Biblioteca/disponibles/'
@@ -30,8 +31,34 @@ def app():
         elif opcion == 4:
             ver_libros_disponibles()
             preguntar = False
+        elif opcion == 5:
+            ver_libros_prestados()
+            preguntar = False
+        elif opcion == 6:
+            prestar_libro();
+            preguntar = False
         else:
             print('No es una opción Válida')
+
+def prestar_libro():
+    codigo = input('Ingrese el Codigo del Libro')
+
+    shutil.move(CARPETA_DISPONIBLE + codigo + EXTENSION, CARPETA_OCUPADOS + codigo + EXTENSION)
+
+    print('El Libro ahora se encuentra Reservado')
+
+def ver_libros_prestados():
+    print('Listado de Libros en Prestamo')
+
+    no_disponibles = os.listdir(CARPETA_OCUPADOS)
+
+    registros = [i for i in no_disponibles if i.endswith(EXTENSION)]
+
+    for registro in registros:
+        with open(CARPETA_OCUPADOS + registro) as libro:
+            for linea in libro:
+                print(linea.rstrip())
+            print('\r\n')
 
 def ver_libros_disponibles():
     print('Listar los Libros Disponibles en Tienda')
@@ -117,7 +144,7 @@ def mostrar_menu():
     print('3) Eliminar Libro')
     print('4) Ver Libros Disponibles')
     print('5) Ver Libros Prestados')
-    print('6) Hacer Prestamo del Libro')
+    print('6) Prestar Libro')
 
 
 def crear_directorios():
